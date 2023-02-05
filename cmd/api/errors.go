@@ -26,6 +26,11 @@ func (app *application) userNotRegistered(w http.ResponseWriter, r *http.Request
 	app.errorResponse(w, r, http.StatusNotFound, message)
 }
 
+func (app *application) emailAlreadyUsed(w http.ResponseWriter, r *http.Request) {
+	message := "the requested email is already used"
+	app.errorResponse(w, r, http.StatusNotFound, message)
+}
+
 func (app *application) serverErrorResponse(w http.ResponseWriter, r *http.Request, err error) {
 	app.logError(r, err)
 	message := "the server encountered a problem and could not process your request"

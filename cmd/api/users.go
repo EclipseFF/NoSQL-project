@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
 	"golang.org/x/crypto/bcrypt"
 	"golang/internal/data"
 	"net/http"
@@ -37,6 +38,11 @@ func (app *application) registerUserHandler(w http.ResponseWriter, r *http.Reque
 	}
 
 	result, err := app.models.Users.Insert(user)
+
+	if err != nil && mongo.IsDuplicateKeyError(err) {
+		app.emailAlreadyUsed(w, r)
+		return
+	}
 
 	if err != nil || result.InsertedID != user.ID {
 		app.serverErrorResponse(w, r, err)

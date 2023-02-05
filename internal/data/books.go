@@ -7,13 +7,15 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"log"
+	"time"
 )
 
 type Book struct {
 	Id       primitive.ObjectID `bson:"_id" json:"_id"`
 	Title    string             `bson:"title" json:"title"`
+	Created  time.Time          `json:"created" json:"created"`
+	Author   string             `json:"author" bson:"author"`
 	TextArea string             `bson:"textArea" json:"textArea"`
-	Created  string             `json:"created" json:"created"`
 }
 
 type BookModel struct {
@@ -54,8 +56,9 @@ func (b BookModel) Insert(book Book) (*mongo.InsertOneResult, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	result, err := b.Collection.InsertOne(context.TODO(), js)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	result, err := b.Collection.InsertOne(ctx, js)
 	if err != nil {
 		return nil, err
 	}
