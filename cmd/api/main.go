@@ -29,7 +29,7 @@ type application struct {
 func main() {
 	var cfg config
 	flag.IntVar(&cfg.port, "port", 4000, "backend server port")
-	flag.StringVar(&cfg.db.uri, "db uri", "mongodb+srv://eclipseff:forbidden7432@clustereclipseff.trxn0bs.mongodb.net/?retryWrites=true&w=majority", "db uri")
+	flag.StringVar(&cfg.db.uri, "db uri", "mongodb+srv://eclipseff:vAcv5nQ87SfIkgzk@clustereclipseff.trxn0bs.mongodb.net/?retryWrites=true&w=majority", "db uri")
 	flag.Parse()
 
 	logger := log.New(os.Stdout, "", log.Ldate|log.Ltime)

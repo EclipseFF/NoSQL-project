@@ -12,5 +12,6 @@ func (app *application) routes() *httprouter.Router {
 	router.HandlerFunc(http.MethodPost, "/usersRegister", app.registerUserHandler)
 	router.HandlerFunc(http.MethodPost, "/usersLogin", app.loginHandler)
 	router.HandlerFunc(http.MethodPost, "/bookInsert", app.createBookHandler)
+	router.HandlerFunc(http.MethodPost, "/filteredData", app.getFilteredData)
 	return router
 }

@@ -86,3 +86,26 @@ func (b BookModel) Delete(id primitive.ObjectID) (*mongo.DeleteResult, error) {
 
 	return result, nil
 }
+
+func (b BookModel) GetFilteredData(title string) []Book {
+	filter := bson.D{{"title", bson.D{{"$gte", title}}}}
+	cursor, err := b.Collection.Find(context.TODO(), filter)
+	if err != nil {
+		return nil
+	}
+	var books []Book
+
+	for cursor.Next(context.TODO()) {
+		var result Book
+		if err := cursor.Decode(&result); err != nil {
+			log.Fatal(err)
+		}
+		books = append(books, result)
+	}
+	if err := cursor.Err(); err != nil {
+		log.Fatal(err)
+	}
+
+	return books
+
+}
