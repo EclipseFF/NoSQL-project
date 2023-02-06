@@ -88,7 +88,7 @@ func (b BookModel) Delete(id primitive.ObjectID) (*mongo.DeleteResult, error) {
 }
 
 func (b BookModel) GetFilteredData(title string) []Book {
-	filter := bson.D{{"title", bson.D{{"$gte", title}}}}
+	filter := bson.D{{"title", title}}
 	cursor, err := b.Collection.Find(context.TODO(), filter)
 	if err != nil {
 		return nil
