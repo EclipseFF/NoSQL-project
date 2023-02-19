@@ -6,7 +6,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
-	"log"
+	options2 "go.mongodb.org/mongo-driver/mongo/options"
 	"time"
 )
 
@@ -15,39 +15,36 @@ type Book struct {
 	Title    string             `bson:"title" json:"title"`
 	Created  time.Time          `json:"created" json:"created"`
 	Author   string             `json:"author" bson:"author"`
-	TextArea string             `bson:"textArea" json:"textArea"`
+	TextArea string             `bson:"-" json:"-"`
 }
 
 type BookModel struct {
 	Collection *mongo.Collection
 }
 
-func (b BookModel) Get(id primitive.ObjectID) ([]Book, error) {
+func (b BookModel) Get(id primitive.ObjectID) (any, error) {
 
 	if id.String() == "" {
 		return nil, errors.New("id can't be empty")
 	}
 
 	filter := bson.D{{"_id", id}}
-	cursor, err := b.Collection.Find(context.TODO(), filter)
+	result := b.Collection.FindOne(context.Background(), filter)
+
+	book := struct {
+		Id       primitive.ObjectID `bson:"_id" json:"_id"`
+		Title    string             `bson:"title" json:"title"`
+		Created  time.Time          `json:"created" json:"created"`
+		Author   string             `json:"author" bson:"author"`
+		TextArea string             `bson:"textArea" json:"textArea"`
+	}{}
+
+	err := result.Decode(&book)
 	if err != nil {
 		return nil, err
 	}
 
-	var books []Book
-
-	for cursor.Next(context.TODO()) {
-		var result Book
-		if err := cursor.Decode(&result); err != nil {
-			log.Fatal(err)
-		}
-		books = append(books, result)
-	}
-	if err := cursor.Err(); err != nil {
-		log.Fatal(err)
-	}
-
-	return books, nil
+	return &book, nil
 }
 
 func (b BookModel) Insert(book Book) (*mongo.InsertOneResult, error) {
@@ -87,25 +84,77 @@ func (b BookModel) Delete(id primitive.ObjectID) (*mongo.DeleteResult, error) {
 	return result, nil
 }
 
-func (b BookModel) GetFilteredData(title string) []Book {
-	filter := bson.D{{"title", title}}
-	cursor, err := b.Collection.Find(context.TODO(), filter)
-	if err != nil {
-		return nil
-	}
+func (b BookModel) GetFilteredData(urlFilter string) ([]Book, error) {
 	var books []Book
 
-	for cursor.Next(context.TODO()) {
+	options := options2.Find().SetSort(bson.D{{"created", -1}})
+	filter := bson.D{{"title", urlFilter}}
+	cursor, err := b.Collection.Find(context.Background(), filter, options)
+	if err != nil {
+		return nil, err
+	}
+
+	for cursor.Next(context.Background()) {
 		var result Book
 		if err := cursor.Decode(&result); err != nil {
-			log.Fatal(err)
+			return nil, err
 		}
 		books = append(books, result)
 	}
+
 	if err := cursor.Err(); err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 
-	return books
+	filter = bson.D{{"author", urlFilter}}
+	cursor, err = b.Collection.Find(context.Background(), filter, options)
 
+	if err != nil {
+		return nil, err
+	}
+	for cursor.Next(context.Background()) {
+		var result Book
+		if err := cursor.Decode(&result); err != nil {
+			return nil, err
+		}
+		//books = append(books, result)
+		for i, book := range books {
+			if result.Id == book.Id {
+				break
+			} else {
+				if i == len(books)-1 {
+					books = append(books, result)
+				}
+			}
+		}
+	}
+	if err := cursor.Err(); err != nil {
+		return nil, err
+	}
+
+	return books, nil
+}
+
+func (b BookModel) GetLatestBooks() ([]Book, error) {
+	var books []Book
+
+	sort := options2.Find().SetSort(bson.D{{"created", -1}})
+	limit := options2.Find().SetLimit(20)
+	cursor, err := b.Collection.Find(context.Background(), bson.D{}, limit, sort)
+	if err != nil {
+		return nil, err
+	}
+
+	for cursor.Next(context.Background()) {
+		var result Book
+		if err := cursor.Decode(&result); err != nil {
+			return nil, err
+		}
+		books = append(books, result)
+	}
+
+	if err := cursor.Err(); err != nil {
+		return nil, err
+	}
+	return books, nil
 }
