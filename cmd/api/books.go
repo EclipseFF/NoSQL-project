@@ -7,6 +7,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"golang/internal/data"
 	"net/http"
+	"strings"
 	"time"
 )
 
@@ -47,6 +48,8 @@ func (app *application) createBookHandler(w http.ResponseWriter, r *http.Request
 func (app *application) getFilteredData(w http.ResponseWriter, r *http.Request) {
 	params := httprouter.ParamsFromContext(r.Context())
 	filter := params.ByName("filter")
+	filter = strings.ReplaceAll(filter, "_", " ")
+
 	if filter == "" {
 		app.badRequestResponse(w, r, errors.New("invalid filter parameter"))
 	}

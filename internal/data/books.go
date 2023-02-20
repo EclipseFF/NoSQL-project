@@ -22,7 +22,7 @@ type BookWithoutText struct {
 	Title    string             `bson:"title" json:"title"`
 	Created  time.Time          `json:"created" json:"created"`
 	Author   string             `json:"author" bson:"author"`
-	TextArea string             `bson:"textArea" json:"textArea"`
+	TextArea string             `bson:"-" json:"-"`
 }
 
 type BookModel struct {
@@ -86,7 +86,7 @@ func (b BookModel) Delete(id primitive.ObjectID) (*mongo.DeleteResult, error) {
 }
 
 func (b BookModel) GetFilteredData(urlFilter string) ([]BookWithoutText, error) {
-	var books []Book
+
 	var test []BookWithoutText
 	options := options2.Find().SetSort(bson.D{{"created", -1}})
 	filter := bson.D{{"title", urlFilter}}
@@ -115,19 +115,39 @@ func (b BookModel) GetFilteredData(urlFilter string) ([]BookWithoutText, error) 
 	}
 	for cursor.Next(context.Background()) {
 		var result BookWithoutText
+
 		if err := cursor.Decode(&result); err != nil {
 			return nil, err
 		}
-		//books = append(books, result)
-		for i, book := range books {
-			if result.Id == book.Id {
-				break
-			} else {
-				if i == len(books)-1 {
-					test = append(test, result)
+
+		switch {
+		case len(test) == 0:
+			test = append(test, result)
+			break
+		case len(test) >= 1:
+			for i, book := range test {
+
+				if result.Id == book.Id {
+					break
+				} else {
+					if i == len(test)-1 {
+						test = append(test, result)
+					}
 				}
 			}
+
 		}
+
+		/*		for i, book := range test {
+
+				if result.Id == book.Id {
+					break
+				} else {
+					if i == len(test)-1 {
+						test = append(test, result)
+					}
+				}
+			}*/
 	}
 	if err := cursor.Err(); err != nil {
 		return nil, err
