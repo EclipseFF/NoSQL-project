@@ -17,7 +17,7 @@ type User struct {
 	Name          string               `bson:"name" json:"name"`
 	Email         string               `bson:"email" json:"email"`
 	Password      password             `bson:"password" json:"-"`
-	IsAuthor      bool                 `bson:"isAuthor" json:"activated"`
+	IsAuthor      bool                 `bson:"isAuthor" json:"isAuthor"`
 	FavoriteBooks []primitive.ObjectID `bson:"favoriteBooks" json:"favoriteBooks"`
 }
 

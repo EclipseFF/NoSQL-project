@@ -11,7 +11,12 @@ import (
 	"time"
 )
 
+func (app *application) enableCors(w *http.ResponseWriter) {
+	(*w).Header().Set("Access-Control-Allow-Origin", "*")
+}
+
 func (app *application) createBookHandler(w http.ResponseWriter, r *http.Request) {
+	app.enableCors(&w)
 	var input struct {
 		Title    string `json:"title"`
 		Author   string `json:"author"`
@@ -47,6 +52,7 @@ func (app *application) createBookHandler(w http.ResponseWriter, r *http.Request
 }
 
 func (app *application) getFilteredData(w http.ResponseWriter, r *http.Request) {
+	app.enableCors(&w)
 	params := httprouter.ParamsFromContext(r.Context())
 	filter := params.ByName("filter")
 	filter = strings.ReplaceAll(filter, "_", " ")
@@ -71,6 +77,7 @@ func (app *application) getFilteredData(w http.ResponseWriter, r *http.Request) 
 }
 
 func (app *application) getLatest(w http.ResponseWriter, r *http.Request) {
+	app.enableCors(&w)
 	books, err := app.models.Books.GetLatestBooks()
 	if err != nil {
 		app.serverErrorResponse(w, r, err)
@@ -86,6 +93,7 @@ func (app *application) getLatest(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *application) getById(w http.ResponseWriter, r *http.Request) {
+	app.enableCors(&w)
 	params := httprouter.ParamsFromContext(r.Context())
 	idFromParam := params.ByName("id")
 	if idFromParam == "" {
