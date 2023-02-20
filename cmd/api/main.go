@@ -51,6 +51,8 @@ func main() {
 		logger: logger,
 	}
 
+	app.logger.Printf("starting server on port %d", cfg.port)
+
 	server := &http.Server{
 		Addr:         fmt.Sprintf(":%d", cfg.port),
 		Handler:      app.routes(),
@@ -67,12 +69,12 @@ func main() {
 }
 
 func openDB(uri string) (*mongo.Client, error) {
-	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(uri))
+	client, err := mongo.Connect(context.Background(), options.Client().ApplyURI(uri))
 	return client, err
 }
 
 func closeDB(client mongo.Client) {
-	if err := client.Disconnect(context.TODO()); err != nil {
+	if err := client.Disconnect(context.Background()); err != nil {
 		panic(err)
 	}
 }
