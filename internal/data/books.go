@@ -29,7 +29,7 @@ type BookModel struct {
 	Collection *mongo.Collection
 }
 
-func (b BookModel) Get(id primitive.ObjectID) (any, error) {
+func (b BookModel) Get(id primitive.ObjectID) (*Book, error) {
 
 	if id.String() == "" {
 		return nil, errors.New("id can't be empty")

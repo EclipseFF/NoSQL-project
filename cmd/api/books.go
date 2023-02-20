@@ -42,6 +42,7 @@ func (app *application) createBookHandler(w http.ResponseWriter, r *http.Request
 	err = app.writeJSON(w, http.StatusAccepted, envelope{"book": book}, nil)
 	if err != nil {
 		app.serverErrorResponse(w, r, err)
+		return
 	}
 }
 
@@ -52,16 +53,19 @@ func (app *application) getFilteredData(w http.ResponseWriter, r *http.Request) 
 
 	if filter == "" {
 		app.badRequestResponse(w, r, errors.New("invalid filter parameter"))
+		return
 	}
 
 	books, err := app.models.Books.GetFilteredData(filter)
 	if err != nil {
 		app.serverErrorResponse(w, r, err)
+		return
 	}
 
 	err = app.writeJSON(w, http.StatusAccepted, envelope{"books": books}, nil)
 	if err != nil {
 		app.serverErrorResponse(w, r, err)
+		return
 	}
 
 }
@@ -70,11 +74,13 @@ func (app *application) getLatest(w http.ResponseWriter, r *http.Request) {
 	books, err := app.models.Books.GetLatestBooks()
 	if err != nil {
 		app.serverErrorResponse(w, r, err)
+		return
 	}
 
 	err = app.writeJSON(w, http.StatusAccepted, envelope{"books": books}, nil)
 	if err != nil {
 		app.serverErrorResponse(w, r, err)
+		return
 	}
 
 }
@@ -84,6 +90,7 @@ func (app *application) getById(w http.ResponseWriter, r *http.Request) {
 	idFromParam := params.ByName("id")
 	if idFromParam == "" {
 		app.errorResponse(w, r, http.StatusBadRequest, "wrong id")
+		return
 	}
 
 	id, err := primitive.ObjectIDFromHex(idFromParam)
@@ -92,15 +99,16 @@ func (app *application) getById(w http.ResponseWriter, r *http.Request) {
 		switch {
 		case errors.Is(err, mongo.ErrNoDocuments):
 			app.notFoundResponse(w, r)
-		default:
-			app.serverErrorResponse(w, r, err)
+			return
 		}
 
+		app.serverErrorResponse(w, r, err)
 	}
 
 	err = app.writeJSON(w, http.StatusOK, envelope{"book": book}, nil)
 	if err != nil {
 		app.serverErrorResponse(w, r, err)
+		return
 	}
 
 }

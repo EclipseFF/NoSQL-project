@@ -1,6 +1,9 @@
 package main
 
-import "net/http"
+import (
+	"fmt"
+	"net/http"
+)
 
 func (app *application) logError(r *http.Request, err error) {
 	app.logger.Print(err)
@@ -26,9 +29,9 @@ func (app *application) userNotRegistered(w http.ResponseWriter, r *http.Request
 	app.errorResponse(w, r, http.StatusNotFound, message)
 }
 
-func (app *application) emailAlreadyUsed(w http.ResponseWriter, r *http.Request) {
-	message := "the requested email is already used"
-	app.errorResponse(w, r, http.StatusNotFound, message)
+func (app *application) resourceAlreadyUsed(w http.ResponseWriter, r *http.Request, resource string) {
+	message := fmt.Sprintf("the requested %s is already used", resource)
+	app.errorResponse(w, r, http.StatusConflict, message)
 }
 
 func (app *application) serverErrorResponse(w http.ResponseWriter, r *http.Request, err error) {

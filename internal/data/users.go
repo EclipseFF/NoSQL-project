@@ -2,6 +2,7 @@ package data
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -11,12 +12,13 @@ import (
 )
 
 type User struct {
-	ID        primitive.ObjectID `bson:"_id" json:"_id"`
-	CreatedAt time.Time          `bson:"createdAt" json:"created_at"`
-	Name      string             `bson:"name" json:"name"`
-	Email     string             `bson:"email" json:"email"`
-	Password  password           `bson:"password" json:"-"`
-	IsAuthor  bool               `bson:"isAuthor" json:"activated"`
+	ID            primitive.ObjectID   `bson:"_id" json:"_id"`
+	CreatedAt     time.Time            `bson:"createdAt" json:"created_at"`
+	Name          string               `bson:"name" json:"name"`
+	Email         string               `bson:"email" json:"email"`
+	Password      password             `bson:"password" json:"-"`
+	IsAuthor      bool                 `bson:"isAuthor" json:"activated"`
+	FavoriteBooks []primitive.ObjectID `bson:"favoriteBooks" json:"favoriteBooks"`
 }
 
 type password struct {
@@ -77,13 +79,33 @@ func (b UserModel) GetByEmail(email string) (*User, error) {
 	return &user, nil
 }
 
+func (b UserModel) GetUserById(id primitive.ObjectID) (*User, error) {
+
+	if id.String() == "" {
+		return nil, errors.New("id can't be empty")
+	}
+
+	filter := bson.D{{"_id", id}}
+	result := b.Collection.FindOne(context.Background(), filter)
+
+	var user User
+
+	err := result.Decode(&user)
+	if err != nil {
+		return nil, err
+	}
+
+	return &user, nil
+}
+
 func (b UserModel) Update(user *User) (*mongo.UpdateResult, error) {
 	filter := bson.D{{"_id", user.ID}}
 	update := bson.D{{"$set", bson.D{
 		{"name", user.Name},
 		{"email", user.Email},
 		{"password.hash", user.Password.Hash},
-		{"isAuthor", user.IsAuthor}}}}
+		{"isAuthor", user.IsAuthor},
+		{"favoriteBooks", user.FavoriteBooks}}}}
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()

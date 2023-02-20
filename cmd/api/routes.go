@@ -15,6 +15,7 @@ func (app *application) routes() http.Handler {
 	router.HandlerFunc(http.MethodGet, "/getBook/:filter", app.getFilteredData)
 	router.HandlerFunc(http.MethodGet, "/getBook", app.getLatest)
 	router.HandlerFunc(http.MethodGet, "/getById/:id", app.getById)
-
+	router.HandlerFunc(http.MethodPost, "/userAddToFav", app.addToFavoriteHandler)
+	router.HandlerFunc(http.MethodPost, "/userRemFromFav", app.removeFromFavoriteHandler)
 	return app.recoverPanic(router)
 }
