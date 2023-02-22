@@ -11,7 +11,7 @@ import (
 )
 
 func (app *application) registerUserHandler(w http.ResponseWriter, r *http.Request) {
-	app.enableCors(&w)
+
 	var input struct {
 		Name     string `json:"name"`
 		Email    string `json:"email"`
@@ -59,7 +59,6 @@ func (app *application) registerUserHandler(w http.ResponseWriter, r *http.Reque
 }
 
 func (app *application) loginHandler(w http.ResponseWriter, r *http.Request) {
-	app.enableCors(&w)
 	var input struct {
 		Email    string `bson:"email" json:"email"`
 		Password string `bson:"password" json:"password"`
@@ -93,7 +92,6 @@ func (app *application) loginHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *application) addToFavoriteHandler(w http.ResponseWriter, r *http.Request) {
-	app.enableCors(&w)
 	var input struct {
 		UserId string `json:"userId"`
 		BookId string `json:"bookId"`
@@ -140,7 +138,6 @@ func (app *application) addToFavoriteHandler(w http.ResponseWriter, r *http.Requ
 }
 
 func (app *application) removeFromFavoriteHandler(w http.ResponseWriter, r *http.Request) {
-	app.enableCors(&w)
 	var input struct {
 		UserId string `json:"userId"`
 		BookId string `json:"bookId"`
