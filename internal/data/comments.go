@@ -9,24 +9,36 @@ import (
 )
 
 type Comment struct {
-	CommentId primitive.ObjectID
-	UserId    primitive.ObjectID
-	BookId    primitive.ObjectID
-	Text      string
+	CommentId primitive.ObjectID `bson:"_id"`
+	UserId    primitive.ObjectID `bson:"userId"`
+	BookId    primitive.ObjectID `bson:"bookId"`
+	Text      string             `bson:"text"`
 }
 
 type CommentModel struct {
 	Collection *mongo.Collection
 }
 
-/*func (m CommentModel) Get(bookId primitive.ObjectID) {
-	booksStage := bson.D{{"$lookup", bson.D{{"from", "Books"}, {"localField", "bookId"}, {"foreignField", "_id"}, {"as", "book"}}}}
-	usersStage := bson.D{{"$lookup", bson.D{{"from", "Users"}, {"localField", "userID"}, {"foreignField", "_id"}, {"as", "commentAuthor"}}}}
-	result, err := m.Collection.Aggregate(context.Background(), mongo.Pipeline{booksStage, usersStage})
+func (m CommentModel) Get(bookId primitive.ObjectID) ([]Comment, error) {
+	filter := bson.D{{"_id", bookId.Hex()}}
+	cursor, err := m.Collection.Find(context.Background(), filter)
+
 	if err != nil {
-		return
+		return nil, err
+
 	}
-}*/
+	var result []Comment
+
+	for cursor.Next(context.Background()) {
+		var comm Comment
+		if err := cursor.Decode(&comm); err != nil {
+			return nil, err
+		}
+		result = append(result, comm)
+	}
+
+	return result, nil
+}
 
 func (m CommentModel) Insert(comment Comment) (*mongo.InsertOneResult, error) {
 	js, err := bson.Marshal(comment)

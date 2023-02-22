@@ -136,7 +136,7 @@ func (app *application) addToFavoriteHandler(w http.ResponseWriter, r *http.Requ
 		app.serverErrorResponse(w, r, err)
 		return
 	}
-	err = app.writeJSON(w, http.StatusOK, envelope{"success": "true"}, nil)
+	err = app.writeJSON(w, http.StatusOK, envelope{"updated_user": user}, nil)
 	if err != nil {
 		app.serverErrorResponse(w, r, err)
 		return
@@ -186,9 +186,11 @@ func (app *application) removeFromFavoriteHandler(w http.ResponseWriter, r *http
 				app.serverErrorResponse(w, r, err)
 				return
 			}
+			app.writeJSON(w, http.StatusOK, envelope{"updated_user": user}, nil)
 			return
 		}
 	}
 
 	app.badRequestResponse(w, r, errors.New("no books were deleted"))
+	return
 }
