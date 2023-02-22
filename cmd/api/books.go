@@ -14,9 +14,11 @@ import (
 func (app *application) createBookHandler(w http.ResponseWriter, r *http.Request) {
 
 	var input struct {
-		Title    string `json:"title"`
-		Author   string `json:"author"`
-		TextArea string `json:"textArea"`
+		Title       string `json:"title"`
+		Author      string `json:"author"`
+		Description string `json:"description"`
+		TextArea    string `json:"textArea"`
+		Url         string `json:"url"`
 	}
 
 	err := app.readJSON(w, r, &input)
@@ -26,11 +28,13 @@ func (app *application) createBookHandler(w http.ResponseWriter, r *http.Request
 	}
 
 	book := &data.Book{
-		Id:       primitive.NewObjectID(),
-		Title:    input.Title,
-		Created:  time.Now(),
-		Author:   input.Author,
-		TextArea: input.TextArea,
+		Id:          primitive.NewObjectID(),
+		Title:       input.Title,
+		Created:     time.Now(),
+		Author:      input.Author,
+		Description: input.Description,
+		TextArea:    input.TextArea,
+		Url:         input.Url,
 	}
 
 	result, err := app.models.Books.Insert(*book)

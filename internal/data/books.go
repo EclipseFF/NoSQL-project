@@ -11,18 +11,22 @@ import (
 )
 
 type Book struct {
-	Id       primitive.ObjectID `bson:"_id" json:"_id"`
-	Title    string             `bson:"title" json:"title"`
-	Created  time.Time          `json:"created" json:"created"`
-	Author   string             `json:"author" bson:"author"`
-	TextArea string             `bson:"textArea" json:"textArea"`
+	Id          primitive.ObjectID `bson:"_id" json:"_id"`
+	Title       string             `bson:"title" json:"title"`
+	Created     time.Time          `json:"created" json:"created"`
+	Author      string             `json:"author" bson:"author"`
+	Description string             `bson:"description" json:"description"`
+	TextArea    string             `bson:"textArea" json:"textArea"`
+	Url         string             `bson:"url" json:"url"`
 }
 type BookWithoutText struct {
-	Id       primitive.ObjectID `bson:"_id" json:"_id"`
-	Title    string             `bson:"title" json:"title"`
-	Created  time.Time          `json:"created" json:"created"`
-	Author   string             `json:"author" bson:"author"`
-	TextArea string             `bson:"-" json:"-"`
+	Id          primitive.ObjectID `bson:"_id" json:"_id"`
+	Title       string             `bson:"title" json:"title"`
+	Created     time.Time          `json:"created" json:"created"`
+	Author      string             `json:"author" bson:"author"`
+	Description string             `bson:"description" json:"description"`
+	TextArea    string             `bson:"-" json:"-"`
+	Url         string             `bson:"url" json:"url"`
 }
 
 type BookModel struct {
