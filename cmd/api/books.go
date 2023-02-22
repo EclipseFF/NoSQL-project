@@ -117,3 +117,45 @@ func (app *application) getById(w http.ResponseWriter, r *http.Request) {
 	}
 
 }
+func (app *application) getFavList(w http.ResponseWriter, r *http.Request) {
+	params := httprouter.ParamsFromContext(r.Context())
+	userId := params.ByName("userId")
+	if userId == "" {
+		app.badRequestResponse(w, r, errors.New("wrong id"))
+		return
+	}
+	id, err := primitive.ObjectIDFromHex(userId)
+	if err != nil {
+		app.serverErrorResponse(w, r, err)
+		return
+	}
+	user, err := app.models.Users.GetUserById(id)
+	if errors.Is(err, mongo.ErrNoDocuments) {
+		app.notFoundResponse(w, r)
+		return
+	}
+
+	var books []data.BookWithoutText
+
+	for _, id := range user.FavoriteBooks {
+		result, err := app.models.Books.Get(id)
+		if err != nil {
+			app.serverErrorResponse(w, r, err)
+			return
+		}
+		var book data.BookWithoutText
+		book.Id = result.Id
+		book.Title = result.Title
+		book.Created = result.Created
+		book.Author = result.Author
+		book.Description = result.Description
+		book.Url = result.Url
+		books = append(books, book)
+	}
+
+	err = app.writeJSON(w, http.StatusOK, envelope{"favorite_books": books}, nil)
+	if err != nil {
+		app.serverErrorResponse(w, r, err)
+		return
+	}
+}

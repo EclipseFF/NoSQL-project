@@ -187,7 +187,11 @@ func (app *application) removeFromFavoriteHandler(w http.ResponseWriter, r *http
 				app.serverErrorResponse(w, r, err)
 				return
 			}
-			app.writeJSON(w, http.StatusOK, envelope{"updated_user": user}, nil)
+			err = app.writeJSON(w, http.StatusOK, envelope{"updated_user": user}, nil)
+			if err != nil {
+				app.serverErrorResponse(w, r, err)
+				return
+			}
 			return
 		}
 	}
