@@ -20,19 +20,12 @@ type CommentModel struct {
 }
 
 /*func (m CommentModel) Get(bookId primitive.ObjectID) {
-	lookup := bson.D{[
-	bson.D{{"$lookup":{from:"users",
-		localField:"author",
-		foreignField:"_id",
-		as:"PostAuthor"
-	}}},
-	bson.D{{"$lookup":{from:"users",
-		localField:"comments.coment_creator",
-		foreignField:"_id",
-		as:"CommentAuthor"
-	}}}
-	]}
-	result, err := m.Collection.Aggregate(context.Background())
+	booksStage := bson.D{{"$lookup", bson.D{{"from", "Books"}, {"localField", "bookId"}, {"foreignField", "_id"}, {"as", "book"}}}}
+	usersStage := bson.D{{"$lookup", bson.D{{"from", "Users"}, {"localField", "userID"}, {"foreignField", "_id"}, {"as", "commentAuthor"}}}}
+	result, err := m.Collection.Aggregate(context.Background(), mongo.Pipeline{booksStage, usersStage})
+	if err != nil {
+		return
+	}
 }*/
 
 func (m CommentModel) Insert(comment Comment) (*mongo.InsertOneResult, error) {

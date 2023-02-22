@@ -84,7 +84,7 @@ func (app *application) loginHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = app.writeJSON(w, http.StatusOK, envelope{"logged user": user}, nil)
+	err = app.writeJSON(w, http.StatusOK, envelope{"logged_user": user}, nil)
 	if err != nil {
 		app.serverErrorResponse(w, r, err)
 		return
@@ -120,6 +120,7 @@ func (app *application) addToFavoriteHandler(w http.ResponseWriter, r *http.Requ
 			return
 		}
 		app.serverErrorResponse(w, r, err)
+		return
 	}
 
 	for _, book := range user.FavoriteBooks {
@@ -132,6 +133,11 @@ func (app *application) addToFavoriteHandler(w http.ResponseWriter, r *http.Requ
 	user.FavoriteBooks = append(user.FavoriteBooks, bookId)
 	result, err := app.models.Users.Update(user)
 	if result.ModifiedCount == 0 {
+		app.serverErrorResponse(w, r, err)
+		return
+	}
+	err = app.writeJSON(w, http.StatusOK, envelope{"success": "true"}, nil)
+	if err != nil {
 		app.serverErrorResponse(w, r, err)
 		return
 	}
