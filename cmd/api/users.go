@@ -172,6 +172,7 @@ func (app *application) removeFromFavoriteHandler(w http.ResponseWriter, r *http
 			return
 		}
 		app.serverErrorResponse(w, r, err)
+		return
 	}
 
 	for i, book := range user.FavoriteBooks {
