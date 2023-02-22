@@ -43,3 +43,7 @@ func (app *application) serverErrorResponse(w http.ResponseWriter, r *http.Reque
 func (app *application) badRequestResponse(w http.ResponseWriter, r *http.Request, err error) {
 	app.errorResponse(w, r, http.StatusBadRequest, err.Error())
 }
+
+func (app *application) emptyComment(w http.ResponseWriter, r *http.Request) {
+	app.errorResponse(w, r, http.StatusBadRequest, "comment can't be empty")
+}

@@ -113,3 +113,7 @@ func (app *application) getById(w http.ResponseWriter, r *http.Request) {
 	}
 
 }
+
+func commentsForBook(id primitive.ObjectID) {
+
+}

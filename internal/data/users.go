@@ -3,7 +3,6 @@ package data
 import (
 	"context"
 	"errors"
-	"fmt"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -64,7 +63,7 @@ func (b UserModel) Insert(user *User) (*mongo.InsertOneResult, error) {
 func (b UserModel) GetByEmail(email string) (*User, error) {
 
 	filter := bson.D{{"email", email}}
-	fmt.Println(email)
+
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 

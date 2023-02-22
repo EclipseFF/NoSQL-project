@@ -61,7 +61,6 @@ func (b BookModel) Insert(book Book) (*mongo.InsertOneResult, error) {
 		return nil, err
 	}
 	return result, nil
-
 }
 
 func (b BookModel) Update(id primitive.ObjectID, newBook Book) (*mongo.UpdateResult, error) {
